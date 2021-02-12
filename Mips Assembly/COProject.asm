@@ -2,6 +2,7 @@
  NewLine: .asciiz " \n "
  ArrSizeMsg: .asciiz "Enter the size of the list <Maximum 25 element> \n"
  ChooseSrtTypMsg: .asciiz "Enter the type of sorting (1)for bubble sort,or (2)for selection sort "
+ array: .word 0
  List: .word 0:100
  EntrElmntMsg: .asciiz "Enter The Elements: \n"
 .text
@@ -14,46 +15,40 @@
     li $v0,5
     syscall
      #assign number to $t0   $t0=$v0   <$v0 is the array size>
-    move $t0 ,$v0 
+    addi $t0 ,$v0,0 
     #Make $t3 equal zero to become the list index
     addi $t3,$zero,0
-    #Loop to input
-    while:
+    #Print Message EntrElmntMsg \n
+    li $v0, 4
+    la $a0 ,EntrElmntMsg
+    syscall
+    #to git elemints from s1 & store in list
+    la $s1,array
+     #Loop to input
+    ForLoop:
         #condition to exit loop if loop counter(ArraySize) became zero
-        beqz $t0 ,exit
-         #Print Message EntrElmntMsg \n
-         li $v0, 4
-         la $a0 ,EntrElmntMsg
-         syscall
+        beq $t3,$t0,exit
     
          #take array elements
          li $v0,5
          syscall
-         #move array element to $t1
-         move $t1,$v0 
-         syscall
-         #Put array elemnt in array space in memory
-         lw $t4,List($t3)
-         syscall
-         #Print the current number
-       #  li $v0,1
-       # move $a0,$t4
-       #  syscall
-         #increment the list index by 4 to load in next memory space
-         #addi $t3,$t3,4
-         #decrement th counter(Size) by one
-         subi $t0,$t0,1
-         syscall
+         #store the value in $s1
+         sw $v0,0($s1)
+         #move to next allocation
+         addi $s1,$s1,4
+ 
+         #increment the index
+         addi $t3,$t3,1
+ 
+         j ForLoop 
+       
     exit:
        #printing a new line
        li $v0,4
        la $a0,NewLine
        syscall
-       #Tell System to End Process
-       li $v0,10
-       syscall
-       #return to While line
-       j while
+      
+       
     #Print Message of Choosing Sorting Type
     li $v0, 4
     la $a0 ,ChooseSrtTypMsg
@@ -63,3 +58,13 @@
     syscall
   #Switch Branching 
     
+    
+    
+    
+    
+    
+    
+    
+ #Tell System to End Process
+       li $v0,10
+       syscall
